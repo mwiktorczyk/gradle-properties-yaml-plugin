@@ -1,0 +1,49 @@
+apply plugin: "groovy"
+apply plugin: "maven"
+apply plugin: "idea"
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+// Release version that won't conflict with the bintray plugin
+def releaseVersion = "0.0.1"
+group = "pl.softmate"
+archivesBaseName = 'gradle-properties-yaml-plugin'
+version = releaseVersion
+ext.isSnapshot = releaseVersion.endsWith("SNAPSHOT")
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    compile localGroovy()
+    compile gradleApi()
+    compile 'org.yaml:snakeyaml:1.16'
+    compile 'org.springframework:spring-core:4.2.1.RELEASE'
+}
+
+task sourceJar(type: Jar) {
+    description = "An archive of the source code for Maven Central"
+    classifier = "sources"
+    from sourceSets.main.groovy
+}
+
+task groovydocJar(type: Jar) {
+    description = "An archive of the GroovyDocs for Maven Central"
+    classifier = 'javadoc'
+    from groovydoc
+}
+
+artifacts {
+    archives jar, groovydocJar, sourceJar
+}
+
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
