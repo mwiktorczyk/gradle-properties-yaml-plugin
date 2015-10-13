@@ -28,7 +28,7 @@ Processing of YAML files is inspired by those in Grails 3 i.e.:
 * Thanks to Spring's [PropertyResolver](http://docs.spring.io/spring/docs/4.2.1.RELEASE/javadoc-api/org/springframework/core/env/PropertyResolver.html) properties are evaluated just like properties in Maven
 * If YAML segment is marked as profile (`profile.id`) it will be included only if it is active (`profile.active: true`) or is activated from command-line (`gradle -PyamlProfiles=fakehost`)
 
-### Example ###
+## Example ##
 
 YAML file
 
@@ -178,3 +178,24 @@ Gradle output (`gradle printProps -PyamlProfiles=fakehost,!localhost`)
     
     'lorem'' does not exists as system property
     'ldap.rootpw' does not exists as system property
+
+
+## Usage ##
+
+To use the plugin with Gradle, add the following to `build.gradle`:
+
+    // Pull the plugin from Bintray
+    buildscript {
+      repositories {
+        jcenter()
+        maven {
+            url  "http://dl.bintray.com/mariusz/maven"
+        }
+    }
+      dependencies {
+        classpath 'pl.softmate:gradle-properties-yaml-plugin:0.0.1'
+      }
+    }
+    
+    // invoke the plugin
+    apply plugin: 'gradle-properties-yaml-plugin'

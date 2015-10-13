@@ -1,16 +1,19 @@
-apply plugin: "groovy"
-apply plugin: "maven"
-apply plugin: "idea"
+plugins {
+    id 'com.jfrog.bintray' version '1.3.1'
+}
+
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'idea'
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
-// Release version that won't conflict with the bintray plugin
-def releaseVersion = "0.0.1"
-group = "pl.softmate"
+def releaseVersion = '0.0.1'
+group = 'pl.softmate'
 archivesBaseName = 'gradle-properties-yaml-plugin'
 version = releaseVersion
-ext.isSnapshot = releaseVersion.endsWith("SNAPSHOT")
+ext.isSnapshot = releaseVersion.endsWith('SNAPSHOT')
 
 repositories {
     jcenter()
@@ -25,13 +28,13 @@ dependencies {
 }
 
 task sourceJar(type: Jar) {
-    description = "An archive of the source code for Maven Central"
-    classifier = "sources"
+    description = 'An archive of the source code for Maven Central'
+    classifier = 'sources'
     from sourceSets.main.groovy
 }
 
 task groovydocJar(type: Jar) {
-    description = "An archive of the GroovyDocs for Maven Central"
+    description = 'An archive of the GroovyDocs for Maven Central'
     classifier = 'javadoc'
     from groovydoc
 }
@@ -40,10 +43,36 @@ artifacts {
     archives jar, groovydocJar, sourceJar
 }
 
-
 idea {
     module {
         downloadJavadoc = true
         downloadSources = true
     }
 }
+
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+
+    configurations = ['archives']
+
+    pkg {
+        repo = 'maven'
+        name = project.archivesBaseName
+        desc = "A Gradle plugin for loading and working with yaml properties, enhancing Gradle's built in functionality."
+        licenses = ['MIT']
+        websiteUrl = 'https://github.com/mwiktorczyk/gradle-properties-yaml-plugin'
+        issueTrackerUrl = 'https://github.com/mwiktorczyk/gradle-properties-yaml-plugin/issues'
+        vcsUrl = 'https://github.com/mwiktorczyk/gradle-properties-yaml-plugin.git'
+        labels = ['gradle', 'properties', 'yaml']
+        publicDownloadNumbers = true
+        version {
+            vcsTag = "Release_${releaseVersion}"
+            attributes = [
+                    'gradle-plugin': 'gradle-properties-yaml-plugin'
+            ]
+        }
+    }
+}
+
