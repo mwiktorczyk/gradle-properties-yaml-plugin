@@ -182,15 +182,18 @@ Gradle output (`gradle printProps -PyamlProfiles=fakehost,!localhost`)
 
 ## Usage ##
 
-To use the plugin with Gradle, add the following to `build.gradle`:
+To use the plugin with Gradle 2.1 or later, add the following to the `build.gradle` file:
+
+    plugins {
+      id 'pl.softmate.gradle-properties-yaml-plugin' version '0.0.2'
+    }
+    
+To use the plugin with Gradle 2.0 or older, add the following to `build.gradle`:
 
     // Pull the plugin from Bintray
     buildscript {
       repositories {
         jcenter()
-        maven {
-            url  "http://dl.bintray.com/mariusz/maven"
-        }
     }
       dependencies {
         classpath 'pl.softmate:gradle-properties-yaml-plugin:0.0.2'
