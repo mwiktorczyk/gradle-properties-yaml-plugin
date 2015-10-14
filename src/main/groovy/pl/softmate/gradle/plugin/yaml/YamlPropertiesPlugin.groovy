@@ -66,7 +66,7 @@ class YamlPropertiesPlugin implements Plugin<PluginAware> {
         loadYaml currentProjectPropFile, startParameters, profiles, pluginAware
 
         MutablePropertySources propertySources = new MutablePropertySources()
-        propertySources.addLast(new PluginAwarePropertySource(pluginAware.ext))
+        propertySources.addLast(new PluginAwarePropertySource(pluginAware))
         PropertyResolver propertyResolver = new PropertySourcesPropertyResolver(propertySources)
         propertyResolver.setPlaceholderPrefix('@')
         propertyResolver.setPlaceholderSuffix('@')
@@ -259,20 +259,48 @@ class YamlPropertiesPlugin implements Plugin<PluginAware> {
         task.inputs.property(propertyName, propertyValue)
     }
 
-    static class PluginAwarePropertySource extends PropertySource<ExtraPropertiesExtension> {
+    static class PluginAwarePropertySource extends PropertySource<PluginAware> {
 
-        PluginAwarePropertySource(ExtraPropertiesExtension source) {
+        ExtraPropertiesExtension ext;
+        Map<String, String> startupProjectProperties;
+        Map<String, String> startupSystemProperties;
+        Map<String, String> envProperties;
+        private static final String ENV_PREFIX = 'env.'
+
+        PluginAwarePropertySource(PluginAware source) {
             super('PluginAwarePropertySource', source)
+            ext = source.ext
+            startupProjectProperties = source.gradle.startParameter.projectProperties
+            startupSystemProperties = source.gradle.startParameter.systemPropertiesArgs
+            envProperties = System.getenv()
+
         }
 
         @Override
         Object getProperty(String name) {
-            return getSource().get(name)
+            if (name.startsWith(ENV_PREFIX)) {
+                String envName = name[ENV_PREFIX.length()..-1]
+                if (envProperties.containsKey(envName)) {
+                    return envProperties.get(envName)
+                }
+            }
+            if (startupSystemProperties.containsKey(name)) {
+                return startupSystemProperties.get(name)
+            }
+            if (startupProjectProperties.containsKey(name)) {
+                return startupProjectProperties.get(name)
+            }
+            return ext.get(name)
         }
 
         @Override
         boolean containsProperty(String name) {
-            return getSource().has(name)
+            boolean has = false
+            if (name.startsWith(ENV_PREFIX)) {
+                String envName = name[ENV_PREFIX.length()..-1]
+                has = envProperties.containsKey(envName)
+            }
+            return has || startupSystemProperties.containsKey(name) || startupProjectProperties.containsKey(name) || ext.has(name)
         }
     }
 
