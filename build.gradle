@@ -1,7 +1,20 @@
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "com.gradle.publish:plugin-publish-plugin:0.9.1"
+  }
+}
+
+
 plugins {
     id 'com.jfrog.bintray' version '1.3.1'
 }
 
+apply plugin: "com.gradle.plugin-publish"
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'idea'
@@ -9,11 +22,14 @@ apply plugin: 'idea'
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
-def releaseVersion = '0.0.1'
+def releaseVersion = '0.0.2'
 group = 'pl.softmate'
 archivesBaseName = 'gradle-properties-yaml-plugin'
 version = releaseVersion
-ext.isSnapshot = releaseVersion.endsWith('SNAPSHOT')
+
+ext {
+    myGithubUrl = 'https://github.com/mwiktorczyk/gradle-properties-yaml-plugin'
+}
 
 repositories {
     jcenter()
@@ -50,7 +66,6 @@ idea {
     }
 }
 
-
 bintray {
     user = System.getenv('BINTRAY_USER')
     key = System.getenv('BINTRAY_KEY')
@@ -62,17 +77,31 @@ bintray {
         name = project.archivesBaseName
         desc = "A Gradle plugin for loading and working with yaml properties, enhancing Gradle's built in functionality."
         licenses = ['MIT']
-        websiteUrl = 'https://github.com/mwiktorczyk/gradle-properties-yaml-plugin'
-        issueTrackerUrl = 'https://github.com/mwiktorczyk/gradle-properties-yaml-plugin/issues'
-        vcsUrl = 'https://github.com/mwiktorczyk/gradle-properties-yaml-plugin.git'
+        websiteUrl = project.myGithubUrl
+        issueTrackerUrl = "${project.myGithubUrl}/issues"
+        vcsUrl = "${project.myGithubUrl}.git"
         labels = ['gradle', 'properties', 'yaml']
         publicDownloadNumbers = true
         version {
             vcsTag = "Release_${releaseVersion}"
             attributes = [
-                    'gradle-plugin': 'gradle-properties-yaml-plugin'
+                    'gradle-plugin': project.archivesBaseName
             ]
         }
     }
+}
+
+pluginBundle {
+  website = bintray.pkg.websiteUrl
+  vcsUrl = bintray.pkg.vcsUrl
+  description = bintray.pkg.desc
+  tags = bintray.pkg.labels
+
+  plugins {
+    greetingsPlugin {
+      id = 'pl.softmate.gradle-properties-yaml-plugin'
+      displayName = project.archivesBaseName
+    }
+  }
 }
 

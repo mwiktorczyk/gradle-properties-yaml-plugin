@@ -8,7 +8,7 @@ See the [CHANGELOG](https://github.com/mwiktorczyk/gradle-properties-yaml-plugin
 
 Gradle way of loading and resolving properties is described in [Gradle User Guide](https://docs.gradle.org/current/userguide/build_environment.html).
 
-This plugin uses quite different concept both when it comes to property file format and order of processing. The order of execution for the properties plugin is (unlikely to Gradle original way, **the first one wins**):
+This plugin uses quite different concept both when it comes to property file format and order of processing. The order of execution for the properties plugin is (unlikely to Gradle original way), **the first one wins**:
         
 0. The `gradle.yml` file in the current project's directory.
 0. The `gradle.yml` file in the root project's directory, if the project is a module of a multi-project build.
@@ -36,7 +36,7 @@ YAML file
     ---
     nexus:
       base:
-        username: user1
+        username: '@env.USER@' #Environment variable
         password: pass1
       deploy:
         username: user2
@@ -107,8 +107,8 @@ Gradle output (`gradle printProps`)
     lorem :: ipsum
     nexus.base.password :: pass1
     nexusBasePassword :: pass1
-    nexus.base.username :: user1
-    nexusBaseUsername :: user1
+    nexus.base.username :: mwiktorczyk
+    nexusBaseUsername :: mwiktorczyk
     nexus.deploy.password :: pass2
     nexusDeployPassword :: pass2
     nexus.deploy.username :: user2
@@ -142,8 +142,8 @@ Gradle output (`gradle printProps -PyamlProfiles=fakehost`)
     lorem :: ipsum
     nexus.base.password :: pass1
     nexusBasePassword :: pass1
-    nexus.base.username :: user1
-    nexusBaseUsername :: user1
+    nexus.base.username :: mwiktorczyk
+    nexusBaseUsername :: mwiktorczyk
     nexus.deploy.password :: pass2
     nexusDeployPassword :: pass2
     nexus.deploy.username :: user2
@@ -164,8 +164,8 @@ Gradle output (`gradle printProps -PyamlProfiles=fakehost,!localhost`)
     hibernateConnectionHost :: fakehost
     nexus.base.password :: pass1
     nexusBasePassword :: pass1
-    nexus.base.username :: user1
-    nexusBaseUsername :: user1
+    nexus.base.username :: mwiktorczyk
+    nexusBaseUsername :: mwiktorczyk
     nexus.deploy.password :: pass2
     nexusDeployPassword :: pass2
     nexus.deploy.username :: user2
@@ -193,9 +193,9 @@ To use the plugin with Gradle, add the following to `build.gradle`:
         }
     }
       dependencies {
-        classpath 'pl.softmate:gradle-properties-yaml-plugin:0.0.1'
+        classpath 'pl.softmate:gradle-properties-yaml-plugin:0.0.2'
       }
     }
     
     // invoke the plugin
-    apply plugin: 'gradle-properties-yaml-plugin'
+    apply plugin: 'pl.softmate.gradle-properties-yaml-plugin'
